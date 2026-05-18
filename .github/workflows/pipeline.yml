@@ -1,28 +1,39 @@
 name: Pipeline CI/CD + IaC
+
 on:
-push:
-branches: [ "main" ]
+  push:
+    branches: [ "main" ]
+
 jobs:
-integracion-continua:
-runs-on: ubuntu-latest
-steps:
-- uses: actions/checkout@v3
-- name: Configurar Python
-uses: actions/setup-python@v4
-with:
-python-version: '3.10'
-- name: Instalar dependencias
-run: pip install -r requirements.txt
-- name: Ejecutar Pruebas (CI)
-run: pytest test_app.py
-validacion-infraestructura:
-needs: integracion-continua # Solo se ejecuta si Python pasa las pruebas
-runs-on: ubuntu-latest
-steps:
-- uses: actions/checkout@v3
-- name: Instalar Terraform
-uses: hashicorp/setup-terraform@v2
-- name: Terraform Init
-run: terraform init
-- name: Validar Sintaxis IaC (Automatización)
-run: terraform validate
+  integracion-continua:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Configurar Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+
+      - name: Instalar dependencias
+        run: pip install -r requirements.txt
+
+      - name: Ejecutar Pruebas (CI)
+        run: pytest test_app.py
+
+  validacion-infraestructura:
+    needs: integracion-continua
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Instalar Terraform
+        uses: hashicorp/setup-terraform@v2
+
+      - name: Terraform Init
+        run: terraform init
+
+      - name: Validar Terraform
+        run: terraform validate
